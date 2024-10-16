@@ -2,12 +2,29 @@
     "kusama": {
         "replaychains": {
             "kusama": {
-                "Dwellir": "wss://kusama-rpc.dwellir.com"
+                "Allnodes": "wss://kusama-rpc.publicnode.com",
+                "Dwellir": "wss://kusama-rpc.dwellir.com",
+                "Dwellir Tunisia": "wss://kusama-rpc-tn.dwellir.com",
+                "IBP1": "wss://rpc.ibp.network/kusama",
+                "IBP2": "wss://kusama.dotters.network",
+                "LuckyFriday": "wss://rpc-kusama.luckyfriday.io",
+                "OnFinality": "wss://kusama.api.onfinality.io/public-ws",
+                "RadiumBlock": "wss://kusama.public.curie.radiumblock.co/ws",
+                "RockX": "wss://rockx-ksm.w3node.com/polka-public-ksm/ws",
+                "Stakeworld": "wss://ksm-rpc.stakeworld.io",
+                "SubQuery": "wss://kusama.rpc.subquery.network/public/ws"
             }
         },
         "parachains": {
             "KusamaAssetHub": {
-                "Parity": "wss://kusama-asset-hub-rpc.polkadot.io"
+                "Dwellir": "wss://asset-hub-kusama-rpc.dwellir.com",
+                "Dwellir Tunisia": "wss://statemine-rpc-tn.dwellir.com",
+                "IBP1": "wss://sys.ibp.network/statemine",
+                "IBP2": "wss://asset-hub-kusama.dotters.network",
+                "LuckyFriday": "wss://rpc-asset-hub-kusama.luckyfriday.io",
+                "Parity": "wss://kusama-asset-hub-rpc.polkadot.io",
+                "RadiumBlock": "wss://statemine.public.curie.radiumblock.co/ws",
+                "Stakeworld": "wss://ksm-rpc.stakeworld.io/assethub"
             }
         }
     },
@@ -20,7 +37,33 @@
         "parachains": {
             "KusamaAssetHub": {
                 "Dwellir": "wss://asset-hub-kusama-rpc.dwellir.com",
-                "Parity": "wss://kusama-asset-hub-rpc.polkadot.io"
+                "Dwellir Tunisia": "wss://statemine-rpc-tn.dwellir.com",
+                "IBP1": "wss://sys.ibp.network/statemine",
+                "IBP2": "wss://asset-hub-kusama.dotters.network",
+                "LuckyFriday": "wss://rpc-asset-hub-kusama.luckyfriday.io",
+                "Parity": "wss://kusama-asset-hub-rpc.polkadot.io",
+                "RadiumBlock": "wss://statemine.public.curie.radiumblock.co/ws",
+                "Stakeworld": "wss://ksm-rpc.stakeworld.io/assethub"
+            }
+        }
+    },
+    "paseo": {
+        "replaychains": {
+            "polkadot": {
+                "Amforc": "wss://paseo.rpc.amforc.com",
+                "Dwellir": "wss://paseo-rpc.dwellir.com",
+                "IBP1": "wss://rpc.ibp.network/paseo",
+                "IBP2": "wss://paseo.dotters.network",
+                "StakeWorld": "wss://pas-rpc.stakeworld.io"
+            }
+        },
+        "parachains": {
+            "PaseoAssetHub": {
+                "Dwellir": "wss://asset-hub-paseo-rpc.dwellir.com",
+                "IBP1": "wss://sys.ibp.network/asset-hub-paseo",
+                "IBP2": "wss://asset-hub-paseo.dotters.network",
+                "StakeWorld": "wss://pas-rpc.stakeworld.io/assethub",
+                "TurboFlakes": "wss://sys.turboflakes.io/asset-hub-paseo"
             }
         }
     }
