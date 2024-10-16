@@ -14,27 +14,44 @@
     h1 {
       color: #333;
     }
-    .latency-box {
-      display: inline-block;
-      padding: 15px;
-      border: 1px solid #ddd;
-      background-color: #fff;
-      border-radius: 5px;
-      margin: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
-    .latency-box h2 {
-      margin: 0 0 10px;
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #4caf50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
     }
     .latency {
-      font-size: 1.5em;
       color: #4caf50;
+    }
+    .error {
+      color: red;
     }
   </style>
 </head>
 <body>
   <h1>Polkadot WebSocket Latency Checker</h1>
-  <div id="latency-container"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Network</th>
+        <th>Chain</th>
+        <th>Provider</th>
+        <th>Latency</th>
+      </tr>
+    </thead>
+    <tbody id="latency-container"></tbody>
+  </table>
 
   <script>
     async function fetchEndpoints() {
@@ -42,20 +59,23 @@
       return await response.json();
     }
 
-    async function checkLatency(url, elementId) {
+    async function checkLatency(url, rowId) {
       const start = performance.now();
       try {
         const socket = new WebSocket(url);
         socket.onopen = () => {
           const latency = (performance.now() - start).toFixed(2);
-          document.getElementById(elementId).textContent = latency + ' ms';
+          document.getElementById(rowId).querySelector('.latency').textContent = latency + ' ms';
+          document.getElementById(rowId).querySelector('.latency').classList.remove('error');
           socket.close();
         };
         socket.onerror = () => {
-          document.getElementById(elementId).textContent = 'Failed to connect';
+          document.getElementById(rowId).querySelector('.latency').textContent = 'Failed to connect';
+          document.getElementById(rowId).querySelector('.latency').classList.add('error');
         };
       } catch (error) {
-        document.getElementById(elementId).textContent = 'Error';
+        document.getElementById(rowId).querySelector('.latency').textContent = 'Error';
+        document.getElementById(rowId).querySelector('.latency').classList.add('error');
       }
     }
 
@@ -71,14 +91,16 @@
         for (const chain in replaychains) {
           for (const provider in replaychains[chain]) {
             const url = replaychains[chain][provider];
-            const divId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
+            const rowId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
             container.innerHTML += `
-              <div id="${divId}" class="latency-box">
-                <h2>${network} ${chain} - ${provider}</h2>
-                <div class="latency">Checking...</div>
-              </div>
+              <tr id="${rowId}">
+                <td>${network}</td>
+                <td>${chain}</td>
+                <td>${provider}</td>
+                <td class="latency">Checking...</td>
+              </tr>
             `;
-            checkLatency(url, `${divId} .latency`);
+            checkLatency(url, rowId);
           }
         }
 
@@ -86,14 +108,16 @@
         for (const chain in parachains) {
           for (const provider in parachains[chain]) {
             const url = parachains[chain][provider];
-            const divId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
+            const rowId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
             container.innerHTML += `
-              <div id="${divId}" class="latency-box">
-                <h2>${network} ${chain} - ${provider}</h2>
-                <div class="latency">Checking...</div>
-              </div>
+              <tr id="${rowId}">
+                <td>${network}</td>
+                <td>${chain}</td>
+                <td>${provider}</td>
+                <td class="latency">Checking...</td>
+              </tr>
             `;
-            checkLatency(url, `${divId} .latency`);
+            checkLatency(url, rowId);
           }
         }
       }
