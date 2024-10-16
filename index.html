@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polkadot WebSocket Latency Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+    }
+    .latency-box {
+      display: inline-block;
+      padding: 15px;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      border-radius: 5px;
+      margin: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .latency-box h2 {
+      margin: 0 0 10px;
+    }
+    .latency {
+      font-size: 1.5em;
+      color: #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <h1>Polkadot WebSocket Latency Checker</h1>
+  <div id="latency-container"></div>
+
+  <script>
+    async function fetchEndpoints() {
+      const response = await fetch('endpoints.json');
+      return response.json();
+    }
+
+    async function checkLatency(url, element) {
+      const start = performance.now();
+      try {
+        const socket = new WebSocket(url);
+        socket.onopen = () => {
+          const latency = (performance.now() - start).toFixed(2);
+          element.textContent = latency + ' ms';
+          socket.close();
+        };
+        socket.onerror = () => {
+          element.textContent = 'Failed to connect';
+        };
+      } catch (error) {
+        element.textContent = 'Error';
+      }
+    }
+
+    async function loadLatencies() {
+      const container = document.getElementById('latency-container');
+      const data = await fetchEndpoints();
+
+      for (const network in data) {
+        const categories = data[network];
+
+        for (const category in categories) {
+          const endpoints = categories[category];
+          if (Array.isArray(endpoints)) {
+            endpoints.forEach(url => {
+              const box = createLatencyBox(network, category, url);
+              container.appendChild(box);
+              const latencyElement = box.querySelector('.latency');
+              checkLatency(url, latencyElement);
+            });
+          } else {
+            for (const parachain in endpoints) {
+              endpoints[parachain].forEach(url => {
+                const box = createLatencyBox(network, `${category} - ${parachain}`, url);
+                container.appendChild(box);
+                const latencyElement = box.querySelector('.latency');
+                checkLatency(url, latencyElement);
+              });
+            }
+          }
+        }
+      }
+    }
+
+    function createLatencyBox(network, category, url) {
+      const box = document.createElement('div');
+      box.className = 'latency-box';
+      box.innerHTML = `
+        <h2>${network} - ${category}</h2>
+        <p>${url}</p>
+        <div class="latency">Checking...</div>
+      `;
+      return box;
+    }
+
+    loadLatencies();
+    setInterval(loadLatencies, 10000); // Refresh latency every 10 seconds
+  </script>
+</body>
+</html>
