@@ -48,7 +48,8 @@
         <th onclick="sortTable(0)">Network</th>
         <th onclick="sortTable(1)">Chain</th>
         <th onclick="sortTable(2)">Provider</th>
-        <th onclick="sortTable(3)">Latency</th>
+        <th onclick="sortTable(3)">WebSocket URL</th>
+        <th onclick="sortTable(4)">Latency</th>
       </tr>
     </thead>
     <tbody id="latency-container"></tbody>
@@ -98,6 +99,7 @@
                 <td>${network}</td>
                 <td>${chain}</td>
                 <td>${provider}</td>
+                <td>${url}</td>
                 <td class="latency">Checking...</td>
               </tr>
             `;
@@ -115,6 +117,7 @@
                 <td>${network}</td>
                 <td>${chain}</td>
                 <td>${provider}</td>
+                <td>${url}</td>
                 <td class="latency">Checking...</td>
               </tr>
             `;
@@ -128,7 +131,7 @@
       const table = document.getElementById('latency-table');
       const tbody = table.tBodies[0];
       const rows = Array.from(tbody.rows);
-      const isNumericColumn = columnIndex === 3; // Latency column
+      const isNumericColumn = columnIndex === 4; // Latency column
 
       rows.sort((a, b) => {
         const aText = a.cells[columnIndex].textContent.trim();
