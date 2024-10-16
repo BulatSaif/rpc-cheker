@@ -23,6 +23,7 @@
       border: 1px solid #ddd;
       padding: 10px;
       text-align: left;
+      cursor: pointer; /* Make the header look clickable */
     }
     th {
       background-color: #4caf50;
@@ -41,13 +42,13 @@
 </head>
 <body>
   <h1>Polkadot WebSocket Latency Checker</h1>
-  <table>
+  <table id="latency-table">
     <thead>
       <tr>
-        <th>Network</th>
-        <th>Chain</th>
-        <th>Provider</th>
-        <th>Latency</th>
+        <th onclick="sortTable(0)">Network</th>
+        <th onclick="sortTable(1)">Chain</th>
+        <th onclick="sortTable(2)">Provider</th>
+        <th onclick="sortTable(3)">Latency</th>
       </tr>
     </thead>
     <tbody id="latency-container"></tbody>
@@ -121,6 +122,29 @@
           }
         }
       }
+    }
+
+    function sortTable(columnIndex) {
+      const table = document.getElementById('latency-table');
+      const tbody = table.tBodies[0];
+      const rows = Array.from(tbody.rows);
+      const isNumericColumn = columnIndex === 3; // Latency column
+
+      rows.sort((a, b) => {
+        const aText = a.cells[columnIndex].textContent.trim();
+        const bText = b.cells[columnIndex].textContent.trim();
+
+        if (isNumericColumn) {
+          const aLatency = parseFloat(aText);
+          const bLatency = parseFloat(bText);
+          return (isNaN(aLatency) || aLatency === 0 ? Infinity : aLatency) - (isNaN(bLatency) || bLatency === 0 ? Infinity : bLatency);
+        } else {
+          return aText.localeCompare(bText);
+        }
+      });
+
+      // Append sorted rows to the tbody
+      rows.forEach(row => tbody.appendChild(row));
     }
 
     async function init() {
