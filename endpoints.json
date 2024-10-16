@@ -1,7 +1,6 @@
 {
     "kusama": {
         "relaychains": {
-            "kusama": {
                 "Allnodes": "wss://kusama-rpc.publicnode.com",
                 "Dwellir": "wss://kusama-rpc.dwellir.com",
                 "Dwellir Tunisia": "wss://kusama-rpc-tn.dwellir.com",
@@ -13,7 +12,7 @@
                 "RockX": "wss://rockx-ksm.w3node.com/polka-public-ksm/ws",
                 "Stakeworld": "wss://ksm-rpc.stakeworld.io",
                 "SubQuery": "wss://kusama.rpc.subquery.network/public/ws"
-            }
+        
         },
         "parachains": {
             "KusamaAssetHub": {
@@ -38,9 +37,8 @@
     },
     "polkadot": {
         "relaychains": {
-            "polkadot": {
                 "Parity": "wss://rpc.polkadot.io"
-            }
+        
         },
         "parachains": {
             "PolkadotAssetHub": {
@@ -65,13 +63,12 @@
     },
     "paseo": {
         "relaychains": {
-            "polkadot": {
                 "Amforc": "wss://paseo.rpc.amforc.com",
                 "Dwellir": "wss://paseo-rpc.dwellir.com",
                 "IBP1": "wss://rpc.ibp.network/paseo",
                 "IBP2": "wss://paseo.dotters.network",
                 "StakeWorld": "wss://pas-rpc.stakeworld.io"
-            }
+    
         },
         "parachains": {
             "PaseoAssetHub": {
