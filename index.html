@@ -39,69 +39,76 @@
   <script>
     async function fetchEndpoints() {
       const response = await fetch('endpoints.json');
-      return response.json();
+      return await response.json();
     }
 
-    async function checkLatency(url, element) {
+    async function checkLatency(url, elementId) {
       const start = performance.now();
       try {
         const socket = new WebSocket(url);
         socket.onopen = () => {
           const latency = (performance.now() - start).toFixed(2);
-          element.textContent = latency + ' ms';
+          document.getElementById(elementId).textContent = latency + ' ms';
           socket.close();
         };
         socket.onerror = () => {
-          element.textContent = 'Failed to connect';
+          document.getElementById(elementId).textContent = 'Failed to connect';
         };
       } catch (error) {
-        element.textContent = 'Error';
+        document.getElementById(elementId).textContent = 'Error';
       }
     }
 
-    async function loadLatencies() {
+    async function checkLatencies(endpoints) {
       const container = document.getElementById('latency-container');
-      const data = await fetchEndpoints();
+      container.innerHTML = ''; // Clear previous results
 
-      for (const network in data) {
-        const categories = data[network];
+      for (const network in endpoints) {
+        const replaychains = endpoints[network].replaychains;
+        const parachains = endpoints[network].parachains;
 
-        for (const category in categories) {
-          const endpoints = categories[category];
-          if (Array.isArray(endpoints)) {
-            endpoints.forEach(url => {
-              const box = createLatencyBox(network, category, url);
-              container.appendChild(box);
-              const latencyElement = box.querySelector('.latency');
-              checkLatency(url, latencyElement);
-            });
-          } else {
-            for (const parachain in endpoints) {
-              endpoints[parachain].forEach(url => {
-                const box = createLatencyBox(network, `${category} - ${parachain}`, url);
-                container.appendChild(box);
-                const latencyElement = box.querySelector('.latency');
-                checkLatency(url, latencyElement);
-              });
-            }
+        // Display replaychains
+        for (const chain in replaychains) {
+          for (const provider in replaychains[chain]) {
+            const url = replaychains[chain][provider];
+            const divId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
+            container.innerHTML += `
+              <div id="${divId}" class="latency-box">
+                <h2>${network} ${chain} - ${provider}</h2>
+                <div class="latency">Checking...</div>
+              </div>
+            `;
+            checkLatency(url, `${divId} .latency`);
+          }
+        }
+
+        // Display parachains
+        for (const chain in parachains) {
+          for (const provider in parachains[chain]) {
+            const url = parachains[chain][provider];
+            const divId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
+            container.innerHTML += `
+              <div id="${divId}" class="latency-box">
+                <h2>${network} ${chain} - ${provider}</h2>
+                <div class="latency">Checking...</div>
+              </div>
+            `;
+            checkLatency(url, `${divId} .latency`);
           }
         }
       }
     }
 
-    function createLatencyBox(network, category, url) {
-      const box = document.createElement('div');
-      box.className = 'latency-box';
-      box.innerHTML = `
-        <h2>${network} - ${category}</h2>
-        <p>${url}</p>
-        <div class="latency">Checking...</div>
-      `;
-      return box;
+    async function init() {
+      const endpoints = await fetchEndpoints();
+      checkLatencies(endpoints);
+      setInterval(async () => {
+        const updatedEndpoints = await fetchEndpoints();
+        checkLatencies(updatedEndpoints);
+      }, 10000); // Refresh latency every 10 seconds
     }
 
-    loadLatencies();
-    setInterval(loadLatencies, 10000); // Refresh latency every 10 seconds
+    init();
   </script>
 </body>
 </html>
