@@ -1,6 +1,6 @@
 {
     "kusama": {
-        "replaychains": {
+        "relaychains": {
             "kusama": {
                 "Allnodes": "wss://kusama-rpc.publicnode.com",
                 "Dwellir": "wss://kusama-rpc.dwellir.com",
@@ -37,7 +37,7 @@
         }
     },
     "polkadot": {
-        "replaychains": {
+        "relaychains": {
             "polkadot": {
                 "Parity": "wss://rpc.polkadot.io"
             }
@@ -64,7 +64,7 @@
         }
     },
     "paseo": {
-        "replaychains": {
+        "relaychains": {
             "polkadot": {
                 "Amforc": "wss://paseo.rpc.amforc.com",
                 "Dwellir": "wss://paseo-rpc.dwellir.com",
