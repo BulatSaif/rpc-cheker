@@ -14,17 +14,39 @@
     h1 {
       color: #333;
     }
+    .tab {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .tab button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .tab button.active {
+      background-color: #333;
+    }
+    .content {
+      display: none;
+      margin-top: 20px;
+    }
+    .content.active {
+      display: block;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      margin-bottom: 40px; /* Space between tables */
     }
     th, td {
       border: 1px solid #ddd;
       padding: 10px;
       text-align: left;
-      cursor: pointer; /* Make the header look clickable */
+      cursor: pointer; /* Make header clickable */
     }
     th {
       background-color: #4caf50;
@@ -44,7 +66,15 @@
 <body>
   <h1>Polkadot WebSocket Latency Checker</h1>
   
-  <div id="tables-container"></div> <!-- Container for the tables -->
+  <!-- Tabs for each network -->
+  <div class="tab">
+    <button onclick="showNetwork('kusama')" class="active">Kusama</button>
+    <button onclick="showNetwork('polkadot')">Polkadot</button>
+  </div>
+
+  <!-- Content for each network -->
+  <div id="kusama" class="content active"></div>
+  <div id="polkadot" class="content"></div>
 
   <script>
     async function fetchEndpoints() {
@@ -72,76 +102,58 @@
       }
     }
 
-    async function checkLatencies(endpoints) {
-      const container = document.getElementById('tables-container');
+    async function checkLatencies(endpoints, network) {
+      const container = document.getElementById(network);
       container.innerHTML = ''; // Clear previous results
 
-      for (const network in endpoints) {
-        // Create a new table for each network
+      const parachains = endpoints[network].parachains;
+      for (const chain in parachains) {
+        // Create a new table for each parachain
         const tableHTML = `
-          <h2>${network.charAt(0).toUpperCase() + network.slice(1)} Network</h2>
-          <table id="${network}-table">
+          <h2>${chain} Parachain</h2>
+          <table id="${network}-${chain}-table">
             <thead>
               <tr>
-                <th onclick="sortTable('${network}-table', 0)">Network</th>
-                <th onclick="sortTable('${network}-table', 1)">Chain</th>
-                <th onclick="sortTable('${network}-table', 2)">Provider</th>
-                <th onclick="sortTable('${network}-table', 3)">WebSocket URL</th>
-                <th onclick="sortTable('${network}-table', 4)">Latency</th>
+                <th onclick="sortTable('${network}-${chain}-table', 0)">Provider</th>
+                <th onclick="sortTable('${network}-${chain}-table', 1)">WebSocket URL</th>
+                <th onclick="sortTable('${network}-${chain}-table', 2)">Latency</th>
               </tr>
             </thead>
-            <tbody id="${network}-container"></tbody>
+            <tbody id="${network}-${chain}-container"></tbody>
           </table>
         `;
         container.innerHTML += tableHTML;
 
-        const networkContainer = document.getElementById(`${network}-container`);
-        const replaychains = endpoints[network].replaychains;
-        const parachains = endpoints[network].parachains;
-
-        // Display replaychains
-        for (const chain in replaychains) {
-          for (const provider in replaychains[chain]) {
-            const url = replaychains[chain][provider];
-            const rowId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
-            networkContainer.innerHTML += `
-              <tr id="${rowId}">
-                <td>${network}</td>
-                <td>${chain}</td>
-                <td>${provider}</td>
-                <td>${url}</td>
-                <td class="latency">Checking...</td>
-              </tr>
-            `;
-            checkLatency(url, rowId);
-          }
-        }
-
-        // Display parachains
-        for (const chain in parachains) {
-          for (const provider in parachains[chain]) {
-            const url = parachains[chain][provider];
-            const rowId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
-            networkContainer.innerHTML += `
-              <tr id="${rowId}">
-                <td>${network}</td>
-                <td>${chain}</td>
-                <td>${provider}</td>
-                <td>${url}</td>
-                <td class="latency">Checking...</td>
-              </tr>
-            `;
-            checkLatency(url, rowId);
-          }
+        const parachainContainer = document.getElementById(`${network}-${chain}-container`);
+        for (const provider in parachains[chain]) {
+          const url = parachains[chain][provider];
+          const rowId = `${network}-${chain}-${provider}`.replace(/\s+/g, '-');
+          parachainContainer.innerHTML += `
+            <tr id="${rowId}">
+              <td>${provider}</td>
+              <td>${url}</td>
+              <td class="latency">Checking...</td>
+            </tr>
+          `;
+          checkLatency(url, rowId);
         }
       }
+    }
+
+    function showNetwork(network) {
+      const contents = document.querySelectorAll('.content');
+      const tabs = document.querySelectorAll('.tab button');
+      contents.forEach(content => content.classList.remove('active'));
+      tabs.forEach(tab => tab.classList.remove('active'));
+      document.getElementById(network).classList.add('active');
+      event.currentTarget.classList.add('active');
     }
 
     function sortTable(tableId, columnIndex) {
       const table = document.getElementById(tableId);
       const tbody = table.tBodies[0];
       const rows = Array.from(tbody.rows);
-      const isNumericColumn = columnIndex === 4; // Latency column
+      const isNumericColumn = columnIndex === 2; // Latency column
 
       rows.sort((a, b) => {
         const aText = a.cells[columnIndex].textContent.trim();
@@ -156,16 +168,17 @@
         }
       });
 
-      // Append sorted rows to the tbody
       rows.forEach(row => tbody.appendChild(row));
     }
 
     async function init() {
       const endpoints = await fetchEndpoints();
-      checkLatencies(endpoints);
+      checkLatencies(endpoints, 'kusama');
+      checkLatencies(endpoints, 'polkadot');
       setInterval(async () => {
         const updatedEndpoints = await fetchEndpoints();
-        checkLatencies(updatedEndpoints);
+        checkLatencies(updatedEndpoints, 'kusama');
+        checkLatencies(updatedEndpoints, 'polkadot');
       }, 10000); // Refresh latency every 10 seconds
     }
 
